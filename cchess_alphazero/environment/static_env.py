@@ -1,3 +1,4 @@
+# a static chess engine which does not store the board (used in new MCTS player)
 import numpy as np
 
 from cchess_alphazero.environment.light_env.common import *

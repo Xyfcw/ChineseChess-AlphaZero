@@ -1,3 +1,4 @@
+# policy & value network model
 import hashlib
 import json
 import os
@@ -16,6 +17,7 @@ from keras.regularizers import l2
 from cchess_alphazero.agent.api import CChessModelAPI
 from cchess_alphazero.config import Config
 from cchess_alphazero.environment.lookup_tables import ActionLabelsRed, ActionLabelsBlack
+import os
 
 logger = getLogger(__name__)
 
@@ -28,16 +30,33 @@ class CChessModel:
         self.n_labels = len(ActionLabelsRed)
         self.graph = None
         self.api = None
-
+    # 生成model
     def build(self):
+        # class ModelConfig:
+        #     def __init__(self):
+        #         self.cnn_filter_num = 256
+        #         self.cnn_first_filter_size = 5
+        #         self.cnn_filter_size = 3
+        #         self.res_layer_num = 7
+        #         self.l2_reg = 1e-4
+        #         self.value_fc_size = 256
+        #         self.distributed = False
+        #         self.input_depth = 14
         mc = self.config.model
+        # Input（）：用于实例化Keras张量。
         in_x = x = Input((14, 10, 9)) # 14 x 10 x 9
 
-        # (batch, channels, height, width)
+        # (batch（批量）, channels, height, width)
+        # 二维卷积层(例如，图像上的空间卷积)。
+        # filters：卷积核的数目（即输出的维度）
         x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_first_filter_size, padding="same",
                    data_format="channels_first", use_bias=False, kernel_regularizer=l2(mc.l2_reg),
                    name="input_conv-"+str(mc.cnn_first_filter_size)+"-"+str(mc.cnn_filter_num))(x)
+        # 批量标准化层
+        # 该层在每个batch上将前一层的激活值重新规范化，即使得其输出数据的均值接近0，其标准差接近1
+        # axis：整数，指定当 mode=0 时规范化的轴。为1，意味着对每个特征图进行规范化
         x = BatchNormalization(axis=1, name="input_batchnorm")(x)
+        # 将激活函数应用于输出。
         x = Activation("relu", name="input_relu")(x)
 
         for i in range(mc.res_layer_num):
@@ -65,9 +84,11 @@ class CChessModel:
         self.model = Model(in_x, [policy_out, value_out], name="cchess_model")
         self.graph = tf.get_default_graph()
 
+    # 构建残差连接
     def _build_residual_block(self, x, index):
         mc = self.config.model
         in_x = x
+
         res_name = "res" + str(index)
         x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_filter_size, padding="same",
                    data_format="channels_first", use_bias=False, kernel_regularizer=l2(mc.l2_reg), 

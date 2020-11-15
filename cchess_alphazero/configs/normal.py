@@ -72,7 +72,7 @@ class TrainerConfig:
             (400000, 0.0001),
         ]
         self.sl_game_step = 2000
-
+# 与mini相同
 class ModelConfig:
     def __init__(self):
         self.cnn_filter_num = 256

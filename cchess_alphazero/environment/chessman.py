@@ -15,6 +15,8 @@ def creat_points(list_points, list_vs, list_hs):
             list_points.append(Point(v, h))
 
 
+
+
 class Chessman(object):
 
     def __init__(self, name_cn, name, is_red, chessboard, fen):
@@ -163,6 +165,7 @@ class Chessman(object):
                         current_vertical_coordinate, direction_parallel_coordinate, direction, 
                         border_vertical_coordinate, h_or_v, ignore_color=False):
         if direction_chessman != None:
+
             if direction_chessman.is_red == self.is_red or ignore_color:
                 for i in range(direction_vertical_coordinate + direction, current_vertical_coordinate, direction):
                     self.__moving_list.append(
@@ -177,13 +180,14 @@ class Chessman(object):
                 self.__moving_list.append(
                     Point(i, direction_parallel_coordinate) if h_or_v else Point(direction_parallel_coordinate, i))
 
+
     def add_from_probable_points(self, probable_moving_points, current_color):
         for point in probable_moving_points:
             if self.border_check(point.x, point.y):
-                chessman = self.chessboard.get_chessman(
-                    point.x, point.y)
+                chessman = self.chessboard.get_chessman(point.x, point.y)
                 if chessman is None or chessman.is_red != current_color:
                     self.moving_list.append(point)
+
 
 
 class Rook(Chessman):
@@ -199,6 +203,7 @@ class Rook(Chessman):
     def calc_moving_list(self):
         current_v_c = super(Rook, self).position.x
         current_h_c = super(Rook, self).position.y
+        # 得到四个方位最近的棋子，如果没有棋子则为None
         left = super(Rook, self).chessboard.get_left_first_chessman(
             current_v_c, current_h_c)
         right = super(Rook, self).chessboard.get_right_first_chessman(
@@ -207,7 +212,7 @@ class Rook(Chessman):
             current_v_c, current_h_c)
         bottom = super(Rook, self).chessboard.get_bottom_first_chessman(
             current_v_c, current_h_c)
-
+        # 将棋子能到达的坐标放入moving_list
         super(Rook, self).calc_moving_path(left, (left.position.x if left != None else None),
                                            current_v_c, current_h_c, 1, 0, True)
         super(Rook, self).calc_moving_path(right, (right.position.x if right != None else None),
@@ -237,9 +242,11 @@ class Knight(Chessman):
         hs1 = (current_h_c,)
         vs2 = (current_v_c,)
         hs2 = (current_h_c + 1, current_h_c - 1)
+        # 得到所有可能撇脚棋子坐标
         creat_points(probable_obstacle_points, vs1, hs1)
         creat_points(probable_obstacle_points, vs2, hs2)
         current_color = super(Knight, self).is_red
+        # 判断撇脚坐标是否有棋子，得到可能的落子点
         for point in probable_obstacle_points:
             if super(Knight, self).border_check(point.x, point.y):
                 chessman = super(Knight, self).chessboard.get_chessman(
@@ -316,28 +323,47 @@ class Mandarin(Chessman):
 
     def __init__(self, name_cn, name, is_red, chessboard, fen):
         super(Mandarin, self).__init__(name_cn, name, is_red, chessboard, fen)
-        if self.is_red:
-            self._Chessman__top = 2
-            self._Chessman__bottom = 0
-            self._Chessman__left = 3
-            self._Chessman__right = 5
-        else:
-            self._Chessman__top = 9
-            self._Chessman__bottom = 7
-            self._Chessman__left = 3
-            self._Chessman__right = 5
+        # if self.is_red:
+        #     self._Chessman__top = 2
+        #     self._Chessman__bottom = 0
+        #     self._Chessman__left = 3
+        #     self._Chessman__right = 5
+        # else:
+        #     self._Chessman__top = 9
+        #     self._Chessman__bottom = 7
+        #     self._Chessman__left = 3
+        #     self._Chessman__right = 5
+        # if self.is_red:
+        self._Chessman__top = 9
+        self._Chessman__bottom = 0
+        self._Chessman__left = 0
+        self._Chessman__right = 8
 
-    def calc_moving_list(self):
+
+    # i = 1
+    def calc_moving_list(self, count = 2):
         current_v_c = super(Mandarin, self).position.x
         current_h_c = super(Mandarin, self).position.y
-        probable_moving_points = []
-        vs1 = (current_v_c + 1, current_v_c - 1)
-        hs1 = (current_h_c + 1, current_h_c - 1)
-        creat_points(probable_moving_points, vs1, hs1)
         current_color = super(Mandarin, self).is_red
+        if count == 1:
+            if current_color:
+                probable_moving_points = [Point(4,1)]
+                # print('wwwwwwwwwwwww')
+            else:
+                probable_moving_points = [Point(4,8)]
+                # print('eeeeeeeeeee')
 
+        else:
+            probable_moving_points = []
+            vs1 = (current_v_c + 1, current_v_c - 1)
+            hs1 = (current_h_c + 1, current_h_c - 1)
+            creat_points(probable_moving_points, vs1, hs1)
+
+        # current_color = super(Mandarin, self).is_red
         super(Mandarin, self).add_from_probable_points(
             probable_moving_points, current_color)
+
+
 
 
 class Elephant(Chessman):
@@ -345,14 +371,24 @@ class Elephant(Chessman):
 
     def __init__(self, name_cn, name, is_red, chessboard, fen):
         super(Elephant, self).__init__(name_cn, name, is_red, chessboard, fen)
+        # if self.is_red:
+        #     self._Chessman__top = 4
+        #     self._Chessman__bottom = 0
+        #     self._Chessman__left = 0
+        #     self._Chessman__right = 8
+        # else:
+        #     self._Chessman__top = 9
+        #     self._Chessman__bottom = 5
+        #     self._Chessman__left = 0
+        #     self._Chessman__right = 8
         if self.is_red:
-            self._Chessman__top = 4
+            self._Chessman__top = 9
             self._Chessman__bottom = 0
             self._Chessman__left = 0
             self._Chessman__right = 8
         else:
             self._Chessman__top = 9
-            self._Chessman__bottom = 5
+            self._Chessman__bottom = 0
             self._Chessman__left = 0
             self._Chessman__right = 8
 
@@ -441,3 +477,4 @@ class King(Chessman):
         current_color = super(King, self).is_red
         super(King, self).add_from_probable_points(
             probable_moving_points, current_color)
+

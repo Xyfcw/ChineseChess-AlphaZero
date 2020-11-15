@@ -32,8 +32,8 @@ class PlayDataConfig:
 
 class PlayConfig:
     def __init__(self):
-        self.max_processes = 10     # tune this to your cpu cores
-        self.search_threads = 10    # increase this will be faster but with weaker performance
+        self.max_processes = 2     # tune this to your cpu cores
+        self.search_threads = 25    # increase this will be faster but with weaker performance
         self.vram_frac = 1.0
         self.simulation_num_per_move = 800
         self.thinking_loop = 1
@@ -53,7 +53,7 @@ class PlayConfig:
 
 class TrainerConfig:
     def __init__(self):
-        self.min_games_to_begin_learn = 5000 
+        self.min_games_to_begin_learn = 5000
         self.min_data_size_to_learn = 0
         self.cleaning_processes = 20
         self.vram_frac = 1.0
@@ -78,9 +78,9 @@ class TrainerConfig:
 
 class ModelConfig:
     def __init__(self):
-        '''
-        WARNING: DO NOT CHANGE THESE PARAMETERS
-        '''
+
+        # WARNING: DO NOT CHANGE THESE PARAMETERS
+
         self.cnn_filter_num = 192
         self.cnn_first_filter_size = 5
         self.cnn_filter_size = 3
@@ -89,3 +89,4 @@ class ModelConfig:
         self.value_fc_size = 256
         self.distributed = False
         self.input_depth = 14
+

@@ -11,7 +11,7 @@ from cchess_alphazero.environment.lookup_tables import Winner, ActionLabelsRed, 
 from time import time, sleep
 import gc 
 import sys
-
+# the final agent that play with neural network and MCTS(使用神经网络和MCTS的最终代理)
 logger = getLogger(__name__)
 
 class VisitState:
@@ -40,6 +40,7 @@ class CChessPlayer:
         self.labels_n = len(ActionLabelsRed)
         self.labels = ActionLabelsRed
         self.move_lookup = {move: i for move, i in zip(self.labels, range(self.labels_n))}
+        # pipes:用于与CChessModelAPI线程通信
         self.pipe = pipes                   # pipes that used to communicate with CChessModelAPI thread
         self.node_lock = defaultdict(Lock)  # key: state key, value: Lock of that state
         self.use_history = use_history
@@ -61,6 +62,7 @@ class CChessPlayer:
 
         self.s_lock = Lock()
         self.run_lock = Lock()
+        # 队列锁定
         self.q_lock = Lock()            # queue lock
         self.t_lock = Lock()
         self.buffer_planes = []         # prediction queue
@@ -375,6 +377,7 @@ class CChessPlayer:
     def calc_policy(self, state, turns, no_act) -> np.ndarray:
         '''
         calculate π(a|s0) according to the visit count
+        根据访问次数计算π(a|s0)
         '''
         node = self.tree[state]
         policy = np.zeros(self.labels_n)

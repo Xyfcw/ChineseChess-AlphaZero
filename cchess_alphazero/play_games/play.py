@@ -65,20 +65,25 @@ class PlayWithHuman:
             self.model.build()
 
     def init_screen(self):
+        # 选择显示模式的最佳颜色深度。
         bestdepth = pygame.display.mode_ok([self.screen_width, self.height], self.winstyle, 32)
+        # 创建一个游戏窗口
         screen = pygame.display.set_mode([self.screen_width, self.height], self.winstyle, bestdepth)
+        # 设置当前窗口标题
         pygame.display.set_caption("中国象棋Zero")
-        # create the background, tile the bgd image
+        # create the background, tile the bgd image（创建背景，平铺BGD图像）
         bgdtile = load_image(f'{self.config.opts.bg_style}.GIF')
         bgdtile = pygame.transform.scale(bgdtile, (self.width, self.height))
         board_background = pygame.Surface([self.width, self.height])
         board_background.blit(bgdtile, (0, 0))
         widget_background = pygame.Surface([self.screen_width - self.width, self.height])
         white_rect = Rect(0, 0, self.screen_width - self.width, self.height)
+        # 填充Surface
         widget_background.fill((255, 255, 255), white_rect)
 
-        #create text label
+        #create text label（创建文本标签）
         font_file = self.config.resource.font_path
+        # 设置字体
         font = pygame.font.Font(font_file, 16)
         font_color = (0, 0, 0)
         font_background = (255, 255, 255)
@@ -91,20 +96,23 @@ class PlayWithHuman:
         screen.blit(board_background, (0, 0))
         screen.blit(widget_background, (self.width, 0))
         pygame.display.flip()
+        # pygame.sprite.Group ：用于保存和管理多个Sprite对象的容器类。
         self.chessmans = pygame.sprite.Group()
         creat_sprite_group(self.chessmans, self.env.board.chessmans_hash, self.chessman_w, self.chessman_h)
         return screen, board_background, widget_background
 
     def start(self, human_first=True):
-        self.env.reset()
+        self.env.reset()# 重置（初始化）引擎环境  （将棋子加到棋盘上）
         self.load_model()
+        # return you
         self.pipe = self.model.get_pipes()
         self.ai = CChessPlayer(self.config, search_tree=defaultdict(VisitState), pipes=self.pipe,
                               enable_resign=True, debugging=True)
         self.human_move_first = human_first
 
-        pygame.init()
+        pygame.init()#初始化所有pygame模块
         screen, board_background, widget_background = self.init_screen()
+        # 初始化了一个Clock对象
         framerate = pygame.time.Clock()
 
         labels = ActionLabelsRed
@@ -115,12 +123,12 @@ class PlayWithHuman:
             self.env.board.calc_chessmans_moving_list()
 
         ai_worker = Thread(target=self.ai_move, name="ai_worker")
-        ai_worker.daemon = True
-        ai_worker.start()
+        ai_worker.daemon = True #将该线程设置为守护线程（进程退出时不需要等待这个线程执行完成）
+        ai_worker.start() #开始执行该线程
 
         while not self.env.board.is_end():
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT:#判断用户是否点击了关闭按钮
                     self.env.board.print_record()
                     self.ai.close(wait=False)
                     game_id = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -129,15 +137,20 @@ class PlayWithHuman:
                     sys.exit()
                 elif event.type == VIDEORESIZE:
                     pass
-                elif event.type == MOUSEBUTTONDOWN:
+                elif event.type == MOUSEBUTTONDOWN:#鼠标按下
                     if human_first == self.env.red_to_move:
+                        # get_pressed()：返回一个由布尔值组成的列表，代表所有鼠标按键被按下的情况。True 意味着在调用此方法时该鼠标按键正被按下。
                         pressed_array = pygame.mouse.get_pressed()
                         for index in range(len(pressed_array)):
                             if index == 0 and pressed_array[index]:
+                                #获取鼠标光标的位置。
                                 mouse_x, mouse_y = pygame.mouse.get_pos()
+                                # 获取点击的棋盘坐标
                                 col_num, row_num = translate_hit_area(mouse_x, mouse_y, self.chessman_w, self.chessman_h)
                                 chessman_sprite = select_sprite_from_group(
                                     self.chessmans, col_num, row_num)
+                                #current_chessman:目标棋子
+                                #chessman_sprite：点击的棋子
                                 if current_chessman is None and chessman_sprite != None:
                                     if chessman_sprite.chessman.is_red == self.env.red_to_move:
                                         current_chessman = chessman_sprite
@@ -169,6 +182,7 @@ class PlayWithHuman:
                                         self.history.append(self.env.get_state())
 
             self.draw_widget(screen, widget_background)
+            # 20：游戏绘制的最大帧率
             framerate.tick(20)
             # clear/erase the last drawn sprites
             self.chessmans.clear(screen, board_background)
@@ -186,8 +200,10 @@ class PlayWithHuman:
         self.env.board.save_record(path)
         sleep(3)
 
+
     def ai_move(self):
         ai_move_first = not self.human_move_first
+        # 得到当前棋盘局面
         self.history = [self.env.get_state()]
         no_act = None
         while not self.env.done:
@@ -225,7 +241,7 @@ class PlayWithHuman:
                     action = flip_move(action)
                 key = self.env.get_state()
                 p, v = self.ai.debug[key]
-                logger.info(f"check = {check}, NN value = {v:.3f}")
+                logger.info(f"NN value = {v:.3f}")
                 self.nn_value = v
                 logger.info("MCTS results:")
                 self.mcts_moves = {}

@@ -14,7 +14,8 @@ BG_STYLE_LIST = ['CANVAS', 'DROPS', 'GREEN', 'QIANHONG', 'SHEET', 'SKELETON', 'W
 RANDOM_LIST = ['none', 'small', 'medium', 'large']
 
 def create_parser():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser()#创建解析器对象
+    # 调用 add_argument() 方法添加参数
     parser.add_argument("cmd", help="what to do", choices=CMD_LIST)
     parser.add_argument("--new", help="run from new best model", action="store_true")
     parser.add_argument("--type", help="use normal setting", default="mini")

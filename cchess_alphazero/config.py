@@ -2,7 +2,11 @@ import os
 import getpass
 
 def _project_dir():
+    # os.path.dirname(path)
+    # 返回path的目录。其实就是os.path.split(path)的第一个元素
     d = os.path.dirname
+    # os.path.abspath(path)
+    # 返回path规范化的绝对路径。
     return d(d(os.path.abspath(__file__)))
 
 
@@ -32,8 +36,9 @@ class Config:
 class ResourceConfig:
     def __init__(self):
         self.project_dir = os.environ.get("PROJECT_DIR", _project_dir())
+        # 得到data path
         self.data_dir = os.environ.get("DATA_DIR", _data_dir())
-
+        # os.path.join()函数用于路径拼接文件路径
         self.model_dir = os.environ.get("MODEL_DIR", os.path.join(self.data_dir, "model"))
         self.model_best_config_path = os.path.join(self.model_dir, "model_best_config.json")
         self.model_best_weight_path = os.path.join(self.model_dir, "model_best_weight.h5")

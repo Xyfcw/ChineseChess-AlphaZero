@@ -30,10 +30,13 @@ def load_model(config, config_file=None):
     use_history = False
     model = CChessModel(config)
     weight_path = config.resource.model_best_weight_path
+
     if not config_file:
+        # 如果存在config_file，将model_best_config.json文件路径赋给config_path
         config_path = config.resource.model_best_config_path
         use_history = False
     else:
+        # 如果不存在config_file
         config_path = os.path.join(config.resource.model_dir, config_file)
     try:
         if not load_model_weight(model, config_path, weight_path):
@@ -46,8 +49,11 @@ def load_model(config, config_file=None):
     return model, use_history
 
 def start(config: Config):
+    # 参数per_process_gpu_memory_fraction：将GPU内存使用率指定为0到1
+    # 参数allow_growth：必要时预留内存。
     set_session_config(per_process_gpu_memory_fraction=1, allow_growth=True, device_list=config.opts.device_list)
     current_model, use_history = load_model(config)
+    # 实现多个进程之间共享内存，并修改数据
     m = Manager()
     cur_pipes = m.list([current_model.get_pipes() for _ in range(config.play.max_processes)])
     # play_worker = SelfPlayWorker(config, cur_pipes, 0)

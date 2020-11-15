@@ -2,13 +2,17 @@ class EvaluateConfig:
     def __init__(self):
         self.vram_frac = 1.0
         self.game_num = 2
+        # MCTS number per move.
         self.simulation_num_per_move = 20 # before 200
         self.thinking_loop = 1
-        self.c_puct = 1 # lower  = prefer mean action value
+        # MCTS中价值网络和政策网络的平衡参数。
+        # lower  = prefer mean action value
+        self.c_puct = 1
         self.tau_decay_rate = 0
         self.noise_eps = 0.2
         self.max_game_length = 100
-        self.max_processes = 2 
+        self.max_processes = 2
+        # MCTS中速度和精度的平衡参数。
         self.search_threads = 10
 
     def update_play_config(self, pc):
@@ -38,6 +42,7 @@ class PlayConfig:
         self.simulation_num_per_move = 100 # just for debug
         self.c_puct = 1.5
         self.noise_eps = 0.25
+        # 随机参数
         self.dirichlet_alpha = 0.2
         self.tau_decay_rate = 0.98
         self.virtual_loss = 3
@@ -69,7 +74,7 @@ class TrainerConfig:
         ]
         self.sl_game_step = 10000
         self.load_step = 6
-
+# 与normal相同
 class ModelConfig:
     def __init__(self):
         self.cnn_filter_num = 256

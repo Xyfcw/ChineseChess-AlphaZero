@@ -56,6 +56,7 @@ class SelfPlayWorker:
 
         self.buffer = []
         need_to_renew_model = True
+        # 实现原始锁对象的类。一旦一个线程获得一个锁，会阻塞随后尝试获得锁的线程，直到它被释放
         job_done.acquire(True)
         logger.info(f"自我博弈开始，请耐心等待....")
 
