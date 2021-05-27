@@ -127,8 +127,8 @@ class Chessboard(object):
         black_pawn_4.add_to_board(6, 6)
         black_pawn_5 = Pawn(u" 卒5黑 ", "black_pawn_5", False, self, 'p')
         black_pawn_5.add_to_board(8, 6)
-        count = 1
-        self.calc_chessmans_moving_list(count)
+
+        self.calc_chessmans_moving_list()
 
     def add_chessman(self, chessman, col_num, row_num):
         self.chessmans[col_num][row_num] = chessman
@@ -146,18 +146,12 @@ class Chessboard(object):
         self.chessmans[col_num][row_num] = None
 
     # 计算棋子行动路径
-    def calc_chessmans_moving_list(self, count = 2):
+    def calc_chessmans_moving_list(self):
         for chessman in self.__chessmans_hash.values():
             # 当归某一方走时，清除moving_list,再计算每个棋子能到达的棋盘位置
             if chessman.is_red == self.__is_red_turn:
                 chessman.clear_moving_list()
-                # 当为“士”时，第一步要限制在田字格内
-                if chessman.fen == 'm' or chessman.fen == 'M':
-                    chessman.calc_moving_list(count)
-                    # print('ssssssssss')
-                else:
-                    # chessman.clear_moving_list()
-                    chessman.calc_moving_list()
+                chessman.calc_moving_list()
 
     def clear_chessmans_moving_list(self):
         for chessman in self.__chessmans_hash.values():
@@ -555,9 +549,6 @@ class Chessboard(object):
                     final_move = move
                     break
         return (self.winner != None, final_move)
-
-
-
 
 RECORD_NOTES = [
     ['0', '0'], ['1', u'一'], ['2', u'二'],

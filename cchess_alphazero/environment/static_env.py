@@ -19,7 +19,7 @@ def done(state, turns=-1, need_check=False):
         return (True, -1, None)
     # if turns > 0 and turns < 20:
     #     return (False, 0, None)
-    board = state_to_board(state)
+    board = state_to_board(state) #一维变二维
     red_k, black_k = [0, 0], [0, 0]
     winner = None
     v = 0
@@ -32,9 +32,11 @@ def done(state, turns=-1, need_check=False):
                 black_k[0] = i
                 black_k[1] = j
     if red_k[0] == 0 and red_k[1] == 0:
+        '''没找到红帅'''
         winner = Winner.black
         v = -1
     elif black_k[0] == 0 and black_k[1] == 0:
+        '''没找到黑将'''
         winner = Winner.red
         v = 1
     elif red_k[1] == black_k[1]:
@@ -46,6 +48,7 @@ def done(state, turns=-1, need_check=False):
                 break
             i += 1
         if not has_block:
+            '''对将'''
             v = 1
             winner = Winner.red
     final_move = None
@@ -140,6 +143,8 @@ def state_to_planes(state):
     e.g.
         rkemsmekr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RKEMSMEKR
         rkemsmek1/8r/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RKEMSMEKR
+        state_to_planes(state).shape == (14, 10, 9)
+        state --> 神经网络输入
     '''
     planes = np.zeros(shape=(14, 10, 9), dtype=np.float32)
     rows = state.split('/')
@@ -168,6 +173,10 @@ def state_history_to_planes(state, history):
     # 0 ~ 14 for current state
     for i in range(len(rows)):
         row = rows[i]
+
+
+
+
         j = 0
         for letter in row:
             if letter.isalpha():

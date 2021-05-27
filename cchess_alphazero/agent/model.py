@@ -43,12 +43,10 @@ class CChessModel:
         #         self.distributed = False
         #         self.input_depth = 14
         mc = self.config.model
-        # Input（）：用于实例化Keras张量。
+        # 14 是所有棋子种类（红/黑算不同种类）
+        # 整体的输入就是14个棋盘堆叠在一起，每个棋盘表示一种棋子的位置：棋子所在的位置为1，其余位置为0。
         in_x = x = Input((14, 10, 9)) # 14 x 10 x 9
 
-        # (batch（批量）, channels, height, width)
-        # 二维卷积层(例如，图像上的空间卷积)。
-        # filters：卷积核的数目（即输出的维度）
         x = Conv2D(filters=mc.cnn_filter_num, kernel_size=mc.cnn_first_filter_size, padding="same",
                    data_format="channels_first", use_bias=False, kernel_regularizer=l2(mc.l2_reg),
                    name="input_conv-"+str(mc.cnn_first_filter_size)+"-"+str(mc.cnn_filter_num))(x)

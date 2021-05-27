@@ -20,4 +20,5 @@ def set_session_config(per_process_gpu_memory_fraction=None, allow_growth=None, 
         )
     )
     sess = tf.Session(config=config)
+    # 设置全局TensorFlow会话
     K.set_session(sess)
